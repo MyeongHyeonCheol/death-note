@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Death Note - Final Moment</title>
-    <!-- 구글 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Nosifer&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -153,33 +152,46 @@
             100% { box-shadow: inset 0 0 50px rgba(255,0,0,0); }
         }
 
+        /* 5. 귀신 이미지 스타일 추가 */
+        #ghost-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 화면 전체를 꽉 채움 */
+            z-index: 9999; /* 가장 최상단에 노출 */
+            display: none; /* 처음에는 숨김 */
+        }
+
     </style>
 </head>
 <body id="main-body">
 
     <div id="flash-overlay"></div>
+    
+    <img id="ghost-image" src="/귀신.jpg" alt="Ghost">
 
-    <!-- 인트로 -->
     <div id="intro-screen">
         <div id="intro-text"></div>
     </div>
 
-    <!-- 데스노트 -->
     <div class="notebook-container" id="notebook">
         <div class="death-note-header">DEATH NOTE</div>
         <div class="note-content">
-            <div id="target-name" class="dynamic-name">이어진</div>
+            <div id="target-name" class="dynamic-name">신창훈</div>
         </div>
     </div>
 
     <script>
-        const introText = "너의 이름은 이어진이구나...";
+        const introText = "너의 이름은 신창훈이구나...";
         const introElement = document.getElementById('intro-text');
         const introScreen = document.getElementById('intro-screen');
         const notebook = document.getElementById('notebook');
         const targetName = document.getElementById('target-name');
         const body = document.getElementById('main-body');
         const flash = document.getElementById('flash-overlay');
+        const ghostImage = document.getElementById('ghost-image');
 
         let index = 0;
 
@@ -208,30 +220,34 @@
 
         // 3. 이름 적기 (임팩트 추가)
         function startWriting() {
-            // 이름이 적히기 시작할 때 몸체에 미세한 떨림 시작 (펜의 압력)
             targetName.classList.add('writing-active');
             body.classList.add('heart-pulse');
             
-            // 이름이 거의 다 적혀갈 때 (약 4초 뒤) 강력한 임팩트
+            // 이름이 거의 다 적혀갈 때 임팩트
             setTimeout(executeImpact, 4000);
         }
 
-        // 4. 최종 임팩트 (심장마비 컨셉)
+        // 4. 최종 임팩트 (심장마비 컨셉) 및 귀신 등장
         function executeImpact() {
-            // 화면 흔들림
             body.classList.add('shake');
-            // 레드 플래시 노출
             flash.style.display = 'block';
-            
-            // 잉크가 번지는 듯한 블러 효과 추가
             targetName.style.filter = "blur(1px) drop-shadow(0 0 5px red)";
             
+            // 1초 뒤 화면 암전
             setTimeout(() => {
                 body.classList.remove('shake');
-                // 서서히 암전되거나 멈춤
                 flash.style.background = "black";
-                flash.style.transition = "background 3s";
+                flash.style.transition = "background 2s"; // 천천히 암전되도록 시간 단축
+                
+                // 암전이 완전히 끝난 뒤 (2.5초 후) 귀신 사진 띄우기
+                setTimeout(showGhost, 2500);
             }, 1000);
+        }
+
+        // 5. 귀신 등장 함수
+        function showGhost() {
+            ghostImage.style.display = 'block';
+            body.classList.add('shake'); // 귀신이 나타날 때 다시 화면 흔들림 효과
         }
 
         window.onload = () => {
