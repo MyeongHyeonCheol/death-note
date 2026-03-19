@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Death Note - Final Moment</title>
+    <!-- 구글 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Nosifer&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blood-red: #8b0000;
+            --bright-red: #ff0000;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Nanum Pen Script', cursive;
+        }
+
+        /* 1. 인트로 화면: 피가 뚝뚝 떨어지는 느낌 */
+        #intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        #intro-text {
+            color: var(--blood-red);
+            font-family: 'Nosifer', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            line-height: 1.8;
+            /* 피가 흘러내리는 듯한 그림자 효과 */
+            text-shadow: 
+                0 0 10px rgba(255, 0, 0, 0.8),
+                2px 10px 20px var(--blood-red),
+                2px 20px 40px rgba(139, 0, 0, 0.6);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: drip-animation 3s infinite;
+        }
+
+        @keyframes drip-animation {
+            0% { text-shadow: 2px 5px 10px var(--blood-red); transform: translateY(0); }
+            50% { text-shadow: 2px 25px 30px var(--bright-red); transform: translateY(5px); }
+            100% { text-shadow: 2px 5px 10px var(--blood-red); transform: translateY(0); }
+        }
+
+        /* 2. 데스노트 컨테이너 */
+        .notebook-container {
+            opacity: 0;
+            transform: scale(1.1);
+            transition: opacity 2s ease-in, transform 3s ease-out;
+            width: 85%;
+            max-width: 500px;
+            height: 750px;
+            background: #d9d4c7;
+            box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 100px rgba(0,0,0,0.3);
+            padding: 50px 40px;
+            position: relative;
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+        }
+
+        .death-note-header {
+            font-family: 'Nosifer', cursive;
+            font-size: 2.8rem;
+            text-align: center;
+            color: #1a1a1a;
+            margin-bottom: 60px;
+            letter-spacing: 12px;
+            opacity: 0.9;
+        }
+
+        .note-content {
+            padding-left: 30px;
+        }
+
+        .fixed-name {
+            font-size: 3.5rem;
+            color: #111;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        /* 3. 이름 적힐 때의 효과 */
+        .dynamic-name {
+            font-size: 4rem;
+            color: #000;
+            opacity: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            border-right: 3px solid transparent; /* 펜촉 느낌 */
+        }
+
+        /* 이름 적히는 애니메이션 */
+        .writing-active {
+            animation: typing 5s steps(10, end) forwards;
+            opacity: 1 !important;
+        }
+
+        @keyframes typing {
+            from { width: 0; border-right-color: #000; }
+            to { width: 100%; border-right-color: transparent; }
+        }
+
+        /* 4. 임팩트 효과 (전체 화면 흔들림 및 레드 플래시) */
+        .shake {
+            animation: screen-shake 0.1s infinite;
+        }
+
+        @keyframes screen-shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            25% { transform: translate(-2px, -2px) rotate(-1deg); }
+            50% { transform: translate(-3px, 0px) rotate(1deg); }
+            75% { transform: translate(3px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -1px) rotate(-1deg); }
+        }
+
+        #flash-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255,0,0,0.6) 0%, rgba(0,0,0,0.9) 70%);
+            z-index: 200;
+            display: none;
+            pointer-events: none;
+        }
+
+        .heart-pulse {
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: inset 0 0 50px rgba(255,0,0,0); }
+            50% { box-shadow: inset 0 0 200px rgba(255,0,0,0.5); }
+            100% { box-shadow: inset 0 0 50px rgba(255,0,0,0); }
+        }
+
+    </style>
+</head>
+<body id="main-body">
+
+    <div id="flash-overlay"></div>
+
+    <!-- 인트로 -->
+    <div id="intro-screen">
+        <div id="intro-text"></div>
+    </div>
+
+    <!-- 데스노트 -->
+    <div class="notebook-container" id="notebook">
+        <div class="death-note-header">DEATH NOTE</div>
+        <div class="note-content">
+            <div id="target-name" class="dynamic-name">신창훈</div>
+        </div>
+    </div>
+
+    <script>
+        const introText = "너의 이름은 신창훈이구나...";
+        const introElement = document.getElementById('intro-text');
+        const introScreen = document.getElementById('intro-screen');
+        const notebook = document.getElementById('notebook');
+        const targetName = document.getElementById('target-name');
+        const body = document.getElementById('main-body');
+        const flash = document.getElementById('flash-overlay');
+
+        let index = 0;
+
+        // 1. 인트로 타이핑 (피 효과 적용)
+        function typeIntro() {
+            if (index < introText.length) {
+                introElement.innerHTML += introText.charAt(index);
+                introElement.style.width = "auto";
+                index++;
+                setTimeout(typeIntro, 180);
+            } else {
+                setTimeout(revealNotebook, 2000);
+            }
+        }
+
+        // 2. 데스노트 등장
+        function revealNotebook() {
+            introScreen.style.opacity = '0';
+            setTimeout(() => {
+                introScreen.style.display = 'none';
+                notebook.style.opacity = '1';
+                notebook.style.transform = 'scale(1)';
+                setTimeout(startWriting, 2000);
+            }, 1500);
+        }
+
+        // 3. 이름 적기 (임팩트 추가)
+        function startWriting() {
+            // 이름이 적히기 시작할 때 몸체에 미세한 떨림 시작 (펜의 압력)
+            targetName.classList.add('writing-active');
+            body.classList.add('heart-pulse');
+            
+            // 이름이 거의 다 적혀갈 때 (약 4초 뒤) 강력한 임팩트
+            setTimeout(executeImpact, 4000);
+        }
+
+        // 4. 최종 임팩트 (심장마비 컨셉)
+        function executeImpact() {
+            // 화면 흔들림
+            body.classList.add('shake');
+            // 레드 플래시 노출
+            flash.style.display = 'block';
+            
+            // 잉크가 번지는 듯한 블러 효과 추가
+            targetName.style.filter = "blur(1px) drop-shadow(0 0 5px red)";
+            
+            setTimeout(() => {
+                body.classList.remove('shake');
+                // 서서히 암전되거나 멈춤
+                flash.style.background = "black";
+                flash.style.transition = "background 3s";
+            }, 1000);
+        }
+
+        window.onload = () => {
+            setTimeout(typeIntro, 1000);
+        };
+    </script>
+</body>
+</html>
